@@ -17,3 +17,4 @@ coreos_installer_kernel: "rhcos-{{ ocp4_image_version }}-x86_64-installer-kernel
 coreos_installer_initramfs: "rhcos-{{ ocp4_image_version }}-x86_64-installer-initramfs.img"
 coreos_metal_bios: "rhcos-{{ ocp4_image_version }}-x86_64-metal.raw.gz"
 ignition_files_dir: ""
+tear_down: false

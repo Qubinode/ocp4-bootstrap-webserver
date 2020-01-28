@@ -1,6 +1,5 @@
 ---
 # tasks file for ocp4-bootstrap-webserver
-
 - name: get {{ podman_webserver }} container info
   shell: podman inspect -f {%raw%}"{{.State.Status}}"{%endraw%} {{ podman_webserver }}
   register: container_result
@@ -9,13 +8,25 @@
 
 - name: set {{ podman_webserver }} container state
   set_fact:
-    container_exited: "{{ true if container_result.stdout == 'exited' else false }}"
-    container_running: "{{ true if container_result.stdout == 'running' else false }}"
-    container_notexist: "{{ true if container_result.stdout == '' else false }}"
+    container_exited: "{{ true if container_result.stdout is defined and container_result.stdout == 'exited' else false }}"
+    container_running: "{{ true if container_result.stdout is defined and container_result.stdout == 'running' else false }}"
+    container_exist: "{{ true if container_result.stdout is defined and container_result.stdout != '' else false }}"
+
+- name: check if podman websever images exist
+  shell: podman images -q {{ rhcos_webserver_img_name }}
+  register: podman_webserver_image
+  failed_when: false
+  changed_when: false
+
+- name: undo {{ podman_webserver }} deployment
+  include: tear_down.yml
+  when: tear_down|bool and container_result.stdout is defined
 
 - name: include download_rhcos_files.yml
   include: download_rhcos_files.yml
+  when: not tear_down|bool
 
 - name: include deploy_podman_webserver.yml
   include: deploy_podman_webserver.yml
-  when: container_notexist|bool
+  when: not container_exist|bool and not tear_down|bool
+

@@ -74,6 +74,7 @@
     target: '"{{ webserver_directory }}(/.*)?"'
     setype: container_file_t
     state: present
+  when: rhcos_igition_files_cp.changed or rhcos_dependencies_dl.changed
 
 - name: run restorecon on {{ webserver_directory }}
   command: restorecon -RFv {{ webserver_directory }}
