@@ -1,0 +1,19 @@
+---
+# defaults file for ocp4-bootstrap-webserver
+
+ocp4_version: 4.2.0
+rhcos_webserver_img_name: rhcos-webserver
+coreos_tmp_dir: /tmp/build_coreos_container
+admin_user: admin
+virtinstall_dir: /tmp/rhcos-virtinstall
+podman_webserver: qbn-httpd
+webserver_directory: /opt/qubinode_webserver
+ocp4_dependencies_version: "{{ ocp4_version[:3] }}"
+webserver_images: "{{ webserver_directory }}/{{ ocp4_dependencies_version }}/images"
+webserver_dependencies: "{{ webserver_directory }}/{{ ocp4_dependencies_version }}"
+dest_ignitions_web_directory: "{{ webserver_directory }}/{{ ocp4_dependencies_version }}/ignitions/"
+openshift_mirror: "http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/{{ ocp4_dependencies_version }}/{{ ocp4_image_version }}"
+coreos_installer_kernel: "rhcos-{{ ocp4_image_version }}-x86_64-installer-kernel"
+coreos_installer_initramfs: "rhcos-{{ ocp4_image_version }}-x86_64-installer-initramfs.img"
+coreos_metal_bios: "rhcos-{{ ocp4_image_version }}-x86_64-metal.raw.gz"
+ignition_files_dir: ""

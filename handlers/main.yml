@@ -1,0 +1,6 @@
+---
+# handlers file for ocp4-bootstrap-webserver
+- name: restart {{ podman_webserver }}.service
+  service:
+    name: "{{ podman_webserver }}.service"
+    state: restarted

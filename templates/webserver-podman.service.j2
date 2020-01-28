@@ -1,0 +1,20 @@
+[Unit]
+Description=OCP4 Bootstrap Webserver
+After=network.target
+
+[Service]
+Type=simple
+TimeoutStartSec=5m
+
+ExecStartPre=-/usr/bin/podman rm "{{ podman_webserver }}"
+
+ExecStart=/usr/bin/podman run --name={{ podman_webserver }} \
+  -v {{ webserver_directory }}:/var/www/html/pub:Z -p 8080:80  {{ rhcos_webserver_img_name }}
+ExecReload=-/usr/bin/podman stop "{{ podman_webserver }}"
+ExecReload=-/usr/bin/podman rm "{{ podman_webserver }}"
+ExecStop=-/usr/bin/podman stop "{{ podman_webserver }}"
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

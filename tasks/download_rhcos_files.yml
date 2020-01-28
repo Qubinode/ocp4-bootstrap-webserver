@@ -1,0 +1,81 @@
+---
+- name: check if web directory
+  stat:
+    path: "{{ webserver_directory }}"
+  register: webserver_dir
+
+- name: Create a web directory
+  file:
+    path: "{{ webserver_directory }}"
+    state: directory
+    owner: "{{ admin_user }}"
+  register: create_webdir
+  when: webserver_dir.stat.exists == False
+
+- name: Create a {{ ocp4_dependencies_version }} directory
+  file:
+    path: "{{ webserver_dependencies }}"
+    state: directory
+    owner: "{{ admin_user }}"
+
+- name: Create a images directory
+  file:
+    path: "{{ webserver_images }}"
+    state: directory
+    owner: "{{ admin_user }}"
+
+- name: Create ignition directory
+  file:
+    path: "{{ dest_ignitions_web_directory }}"
+    state: directory
+    owner: "{{ admin_user }}"
+
+- name: download the installer-initramfs.img metal-bios.raw.gz installer-kernel
+  get_url:
+    url: "{{ openshift_mirror }}/{{ item }}"
+    dest: "{{ webserver_images }}/{{ item }}"
+  with_items:
+    - "{{ coreos_installer_kernel }}"
+    - "{{ coreos_installer_initramfs }}"
+    - "{{ coreos_metal_bios }}"
+  register: rhcos_dependencies_dl
+  notify:
+    - restart {{ podman_webserver }}.service
+
+- name: get the status of the ignition files are available
+  stat:
+    path: "{{ ignition_files_dir }}/{{ item }}.ign"
+  with_items:
+    - master
+    - worker
+    - bootstrap
+  register: rhcos_igition_files_exist
+
+- name: check if ignition files exist
+  fail:
+    msg: One or more igition file does not exist! Please ensure the igition files have been created under {{ ignition_files_dir }}.
+  with_items: "{{ rhcos_igition_files_exist.results }}"
+  when: item.stat.exists == False
+
+- name: copy over ignition files to webserver pub directory
+  copy:
+    src: "{{ ignition_files_dir }}/{{ item }}.ign"
+    dest: "{{ dest_ignitions_web_directory }}/{{ item }}.ign"
+  with_items:
+    - master
+    - worker
+    - bootstrap
+  register: rhcos_igition_files_cp
+  notify:
+    - restart {{ podman_webserver }}.service
+
+- name: Apply new SELinux file context to {{ webserver_directory }}
+  sefcontext:
+    target: '"{{ webserver_directory }}(/.*)?"'
+    setype: container_file_t
+    state: present
+
+- name: run restorecon on {{ webserver_directory }}
+  command: restorecon -RFv {{ webserver_directory }}
+  when: rhcos_igition_files_cp.changed or rhcos_dependencies_dl.changed
+

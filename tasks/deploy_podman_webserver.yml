@@ -1,0 +1,36 @@
+---
+- name: check if podman websever images exist
+  shell: podman images -q {{ rhcos_webserver_img_name }}
+  register: podman_webserver_image
+  failed_when: false
+  changed_when: false
+
+- name: setup configuration files for podman webserver
+  copy:
+    src: files/webserver
+    dest: "{{ coreos_tmp_dir }}"
+
+- name: build podman webserver image
+  command: podman build --format=docker -t {{ rhcos_webserver_img_name }} .
+  become: yes
+  args:
+    chdir: "{{ coreos_tmp_dir }}/webserver"
+    warn: false
+  when: podman_webserver_image.stdout == ''
+
+- name: deploy {{ podman_webserver }}.service file
+  template:
+    src: webserver-podman.service.j2
+    dest: "/etc/systemd/system/{{ podman_webserver }}.service"
+
+- name: Enable and start {{ podman_webserver }}.service
+  systemd:
+    name: "{{ podman_webserver }}.service"
+    enabled: yes
+    state: started
+
+- name: Enable and start {{ podman_webserver }}.service
+  systemd:
+    name: "{{ podman_webserver }}.service"
+    enabled: yes
+    state: started
