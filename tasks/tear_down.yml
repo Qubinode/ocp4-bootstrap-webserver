@@ -1,0 +1,40 @@
+---
+
+- debug:
+    var: container_exist
+
+- name: check for the {{ podman_webserver }}.service file
+  stat:
+    path: "{{ podman_webserver }}"
+  register: systemd_file
+
+- name: stop and disable the {{ podman_webserver }}.service
+  systemd:
+    name: "{{ podman_webserver }}.service"
+    enabled: no
+    state: stopped
+  when: systemd_file.stat.exists == True
+
+- name: remove the {{ podman_webserver }}.service file
+  file:
+    path: "/etc/systemd/system/{{ podman_webserver }}.service"
+    state: absent
+  register: remove_service
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  when: remove_service.changed
+
+- name: ensure the container is removed
+  command: podman container rm -f {{ podman_webserver }}
+  when: container_exist|bool
+
+- name: ensure the webserver cotainer image is removed
+  command: podman rmi {{ podman_webserver_image.stdout }}
+  when: podman_webserver_image.stdout is defined and podman_webserver_image.stdout != ''
+
+- name: remove the directory {{ webserver_directory }}
+  file:
+    path: "{{ webserver_directory }}"
+    state: absent
