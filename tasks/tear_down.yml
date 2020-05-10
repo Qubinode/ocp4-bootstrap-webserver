@@ -26,8 +26,9 @@
     daemon_reload: yes
   when: remove_service.changed
 
-- name: ensure the container is removed
+- name: ensure the {{ podman_webserver }} container is removed
   command: podman container rm -f {{ podman_webserver }}
+  ignore_errors: yes
   when: container_exist|bool
 
 - name: ensure the webserver cotainer image is removed

@@ -19,7 +19,7 @@ Role Variables
 --------------
 |  **Variable** | **Required** | **Default** | **Description** |
 | :---: | :---: | :---: | :---: |
-|  ocp4_version | yes | 4.2.0 | The release of OCP4 you are installing |
+|  ocp4_release | yes | 4.2.0 | The release of OCP4 you are installing |
 |  rhcos_webserver_img_name | yes | rhcos-webserver | Name for the webserver container image |
 |  coreos_tmp_dir | yes | /tmp/build_coreos_container | Temp folder used for running podman build |
 |  admin_user | yes | admin | The non root user you are logged as |
