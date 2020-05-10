@@ -12,10 +12,10 @@
 
 - name: build podman webserver image
   command: podman build --format=docker -t {{ rhcos_webserver_img_name }} .
-  become: yes
   args:
     chdir: "{{ coreos_tmp_dir }}/webserver"
     warn: false
+  become: yes
   when: podman_webserver_image.stdout == ''
 
 - name: deploy {{ podman_webserver }}.service file
@@ -27,10 +27,39 @@
   systemd:
     name: "{{ podman_webserver }}.service"
     enabled: yes
+    daemon_reload: yes
     state: started
 
-- name: Enable and start {{ podman_webserver }}.service
-  systemd:
-    name: "{{ podman_webserver }}.service"
-    enabled: yes
-    state: started
+- name: Collect services facts
+  service_facts:
+  register: services_state
+
+- name: check for issue https://github.com/containers/libpod/issues/2553
+  block:
+    - name: check logs for reported issue
+      shell: >
+        journalctl -n10 -u {{ podman_webserver }} |awk -F'by' '{print $2}'|awk -F'.' '{print $1}'|awk '{print $1}'|grep -v -e '^$'
+      register: found_issue
+      ignore_errors: yes
+
+    - name: remove existing {{ podman_webserver }} container storage
+      shell: podman rm --force --storage "{{ found_issue.stdout }}"
+      register: remove_issue
+      ignore_errors: yes
+
+    - name: restart {{ podman_webserver }}.service
+      systemd:
+        name: "{{ podman_webserver }}.service"
+        enabled: yes
+        daemon_reload: yes
+        state: restarted
+
+    - name: Collect services facts
+      service_facts:
+      register: services_state
+  when: services_state.ansible_facts and services_state.ansible_facts.services[ podman_webserver  + '.service'].state != 'running'
+
+- name: Check {{ podman_webserver }}.service
+  fail:
+    msg: "The bootstrap webserver {{ podman_webserver }}.service is not running!!! Please check, run: systemctl status {{ podman_webserver }}.service"
+  when: services_state.ansible_facts.services[ podman_webserver  + '.service'].state != 'running'
