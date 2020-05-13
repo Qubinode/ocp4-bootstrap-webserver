@@ -1,8 +1,4 @@
 ---
-
-- debug:
-    var: container_exist
-
 - name: check for the {{ podman_webserver }}.service file
   stat:
     path: "{{ podman_webserver }}"
@@ -15,27 +11,43 @@
     state: stopped
   when: systemd_file.stat.exists == True
 
-- name: remove the {{ podman_webserver }}.service file
-  file:
-    path: "/etc/systemd/system/{{ podman_webserver }}.service"
-    state: absent
-  register: remove_service
-
 - name: reload systemd
   systemd:
     daemon_reload: yes
   when: remove_service.changed
 
-- name: ensure the {{ podman_webserver }} container is removed
-  command: podman container rm -f {{ podman_webserver }}
+- name: get container {{ podman_webserver }} uuid
+  shell: podman ps -a | awk '/{{ podman_webserver }}/ {print $1}'
+  register: container_uuid
   ignore_errors: yes
+
+- name: ensure the {{ podman_webserver }} container is removed
+  #command: podman container rm -f {{ podman_webserver }}
+  command: >
+    podman stop {{ container_uuid.stdout }}
+    podman container rm --force --storage {{ container_uuid.stdout }}
+  ignore_errors: yes
+  register: remove_webserver
   when: container_exist|bool
 
 - name: ensure the webserver cotainer image is removed
   command: podman rmi {{ podman_webserver_image.stdout }}
-  when: podman_webserver_image.stdout is defined and podman_webserver_image.stdout != ''
+  ignore_errors: yes
+  when: podman_webserver_image is defined and podman_webserver_image.stdout != ''
 
 - name: remove the directory {{ webserver_directory }}
   file:
     path: "{{ webserver_directory }}"
     state: absent
+  when: remove_webserver.rc == 0
+
+- name: remove the {{ podman_webserver }}.service file
+  file:
+    path: "/etc/systemd/system/{{ podman_webserver }}.service"
+    state: absent
+  register: remove_service
+  when: remove_webserver.rc == 0
+
+- fail:
+    msg: "Unable to delete {{ podman_webserver }}, either reboot or try to remove it"
+  when: remove_webserver.rc != 0
