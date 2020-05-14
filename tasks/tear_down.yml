@@ -39,15 +39,15 @@
   file:
     path: "{{ webserver_directory }}"
     state: absent
-  when: remove_webserver.rc == 0
+  when: (remove_webserver is defined and remove_webserver.rc is defined and remove_webserver.rc == 0) or (not container_exist|bool)
 
 - name: remove the {{ podman_webserver }}.service file
   file:
     path: "/etc/systemd/system/{{ podman_webserver }}.service"
     state: absent
   register: remove_service
-  when: remove_webserver.rc == 0
+  when: (remove_webserver is defined and remove_webserver.rc is defined and remove_webserver.rc == 0) or (not container_exist|bool)
 
 - fail:
     msg: "Unable to delete {{ podman_webserver }}, either reboot or try to remove it"
-  when: remove_webserver.rc != 0
+  when: (remove_webserver is defined and remove_webserver.rc is defined and remove_webserver.rc != 0) or (container_exist|bool)

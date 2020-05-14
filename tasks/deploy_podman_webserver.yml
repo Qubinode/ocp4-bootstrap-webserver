@@ -1,9 +1,11 @@
 ---
-- name: check if podman websever images exist
-  shell: podman images -q {{ rhcos_webserver_img_name }}
-  register: podman_webserver_image
-  failed_when: false
-  changed_when: false
+- debug:
+    msg:
+      - "container_exited={{ container_exited }}"
+      - "container_running={{ container_running }}"
+      - "container_exist={{ container_exist }}"
+      - "container_result.stdout={{ container_result.stdout }}"
+      - "rhcos_webserver_img_name={{ rhcos_webserver_img_name }}"
 
 - name: setup configuration files for podman webserver
   copy:
@@ -62,4 +64,4 @@
 - name: Check {{ podman_webserver }}.service
   fail:
     msg: "The bootstrap webserver {{ podman_webserver }}.service is not running!!! Please check, run: systemctl status {{ podman_webserver }}.service"
-  when: services_state.ansible_facts.services[ podman_webserver  + '.service'].state != 'running'
+  when: services_state.ansible_facts is defined and services_state.ansible_facts.services[ podman_webserver  + '.service'].state != 'running'
