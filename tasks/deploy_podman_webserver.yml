@@ -1,12 +1,4 @@
 ---
-- debug:
-    msg:
-      - "container_exited={{ container_exited }}"
-      - "container_running={{ container_running }}"
-      - "container_exist={{ container_exist }}"
-      - "container_result.stdout={{ container_result.stdout }}"
-      - "rhcos_webserver_img_name={{ rhcos_webserver_img_name }}"
-
 - name: setup configuration files for podman webserver
   copy:
     src: files/webserver
