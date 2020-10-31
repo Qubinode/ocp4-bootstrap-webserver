@@ -30,14 +30,12 @@
     state: directory
     owner: "{{ admin_user }}"
 
-- name: download the installer-initramfs.img metal-bios.raw.gz installer-kernel
+- name: download the  coreos_rootfs 
   get_url:
     url: "{{ openshift_mirror }}/{{ item }}"
     dest: "{{ webserver_images }}/{{ item }}"
   with_items:
-    - "{{ coreos_installer_kernel }}"
-    - "{{ coreos_installer_initramfs }}"
-    - "{{ coreos_metal_bios }}"
+    - "{{ coreos_rootfs }}"
   register: rhcos_dependencies_dl
   notify:
     - restart {{ podman_webserver }}.service
