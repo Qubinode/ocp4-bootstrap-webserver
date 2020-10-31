@@ -12,7 +12,7 @@
   become: yes
   when: podman_webserver_image.stdout == '' and  build_webserver_image | bool
 
-- name: build podman webserver image
+- name: pull podman webserver image from quay.io
   command: podman pull {{ quayio_webserver_repo }}
   become: yes
   when: podman_webserver_image.stdout == '' and  not build_webserver_image | bool
