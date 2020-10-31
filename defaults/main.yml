@@ -16,4 +16,4 @@ openshift_mirror: "http://mirror.openshift.com/pub/openshift-v4/dependencies/rhc
 coreos_rootfs: "rhcos-{{ ocp4_image_version }}-x86_64-live-rootfs.x86_64.img"
 ignition_files_dir: ""
 tear_down: false
-build_docker_image: false
+build_webserver_image: false
