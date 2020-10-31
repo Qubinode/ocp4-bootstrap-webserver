@@ -10,12 +10,12 @@
     chdir: "{{ coreos_tmp_dir }}/webserver"
     warn: false
   become: yes
-  when: podman_webserver_image.stdout == '' and build_webserver_image | bool
+  when: podman_webserver_image.stdout == '' and  build_webserver_image | bool
 
 - name: build podman webserver image
-  command: podman pull {{ rhcos_webserver_img_name }}
+  command: podman pull {{ quayio_webserver_repo }}
   become: yes
-  when: podman_webserver_image.stdout == '' and not build_webserver_image | bool
+  when: podman_webserver_image.stdout == '' and  not build_webserver_image | bool
 
 - name: deploy {{ podman_webserver }}.service file
   template:

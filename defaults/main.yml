@@ -3,6 +3,7 @@
 
 ocp4_release: 4.6.1
 rhcos_webserver_img_name: rhcos-webserver
+quayio_webserver_repo: quay.io/takinosh/rhcos-webserver
 coreos_tmp_dir: /tmp/build_coreos_container
 admin_user: admin
 virtinstall_dir: /tmp/rhcos-virtinstall
