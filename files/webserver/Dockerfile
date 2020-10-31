@@ -1,17 +1,17 @@
 # Pull the rhel image from the local registry
-FROM rhel7:latest
+FROM  registry.redhat.io/ubi8/ubi
 USER root
 
 MAINTAINER tosin.akinosho@gmail.com
 
 # Fix per https://bugzilla.redhat.com/show_bug.cgi?id=1192200
-RUN yum -y install deltarpm yum-utils --disablerepo=*-eus-* --disablerepo=*-htb-* *-sjis-*\
-    --disablerepo=*-ha-* --disablerepo=*-rt-* --disablerepo=*-lb-* --disablerepo=*-rs-* --disablerepo=*-sap-*
+#RUN dnf -y install deltarpm yum-utils --disablerepo=*-eus-* --disablerepo=*-htb-* *-sjis-*\
+#    --disablerepo=*-ha-* --disablerepo=*-rt-* --disablerepo=*-lb-* --disablerepo=*-rs-* --disablerepo=*-sap-*
 
-RUN yum-config-manager --disable *-eus-* *-htb-* *-ha-* *-rt-* *-lb-* *-rs-* *-sap-* *-sjis* > /dev/null
+#RUN dnf-config-manager --disable *-eus-* *-htb-* *-ha-* *-rt-* *-lb-* *-rs-* *-sap-* *-sjis* > /dev/null
 
 # Update image
-RUN yum install httpd procps-ng -y
+RUN dnf install httpd procps-ng -y
 
 # Add configuration file
 RUN mkdir -p /var/www/html/pub/files
