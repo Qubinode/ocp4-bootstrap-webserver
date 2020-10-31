@@ -12,7 +12,7 @@
   become: yes
   when: podman_webserver_image.stdout == '' && build_docker_image| bool
 
-- name: build podman webserver image
+- name: pull podman webserver image
   command: podman pull {{ rhcos_webserver_img_name }}
   become: yes
   when: podman_webserver_image.stdout == '' && build_docker_image| not bool
