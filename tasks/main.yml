@@ -13,9 +13,9 @@
   include: tear_down.yml
   when: tear_down|bool and container_result.stdout is defined
 
-- name: include download_rhcos_files.yml
-  include: download_rhcos_files.yml
-  when: not tear_down|bool
+#- name: include download_rhcos_files.yml
+#  include: download_rhcos_files.yml
+#  when: not tear_down|bool
 
 - name: include deploy_podman_webserver.yml
   include: deploy_podman_webserver.yml
