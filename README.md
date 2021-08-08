@@ -23,10 +23,7 @@ Role Variables
 |  rhcos_webserver_img_name | yes | rhcos-webserver | Name for the webserver container image |
 |  coreos_tmp_dir | yes | /tmp/build_coreos_container | Temp folder used for running podman build |
 |  admin_user | yes | admin | The non root user you are logged as |
-|  virtinstall_dir | yes | /tmp/rhcos-virtinstall | The directory to store the virt-install generated scripts |
 |  podman_webserver | yes | qbn-httpd | Name for the webserver container |
-|  webserver_directory | yes | /opt/qubinode_webserver | Directory used use for the container volume and to store the files to be served by the webserver |
-| ignition_files_dir | yes | none | Path where you ignitions files are stored |
 | tear_down | yes | false | Set to true to undo it all|
 
 Dependencies

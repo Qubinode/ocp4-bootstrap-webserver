@@ -29,15 +29,15 @@
       ignore_errors: yes
       when: remove_service.changed
 
-    - name: remove the directory {{ webserver_directory }}
-      file:
-        path: "{{ webserver_directory }}"
-        state: absent
-    
-    - name: ensure the webserver cotainer image is removed
-      command: podman rmi {{ podman_webserver_image.stdout }}
-      ignore_errors: yes
-      when: podman_webserver_image is defined and podman_webserver_image.stdout != ''
+    #- name: remove the directory {{ webserver_directory }}
+    #  file:
+    #    path: "{{ webserver_directory }}"
+    #    state: absent
+    #
+    #- name: ensure the webserver cotainer image is removed
+    #  command: podman rmi {{ podman_webserver_image.stdout }}
+    #  ignore_errors: yes
+    #  when: podman_webserver_image is defined and podman_webserver_image.stdout != ''
   when: not container_running|bool
 
 - name: get container {{ podman_webserver }} uuid

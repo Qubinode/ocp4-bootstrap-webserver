@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Pull the rhel image from the local registry
 FROM  registry.redhat.io/ubi8/ubi
 USER root
@@ -21,9 +22,32 @@ ENV HTTPD_VERSION=2.4
 # Fix per https://bugzilla.redhat.com/show_bug.cgi?id=1192200
 #RUN dnf -y install deltarpm yum-utils --disablerepo=*-eus-* --disablerepo=*-htb-* *-sjis-*\
 #    --disablerepo=*-ha-* --disablerepo=*-rt-* --disablerepo=*-lb-* --disablerepo=*-rs-* --disablerepo=*-sap-*
+=======
+#FROM ubi8/ubi
+FROM ubi8/ubi-minimal:latest 
 
-#RUN dnf-config-manager --disable *-eus-* *-htb-* *-ha-* *-rt-* *-lb-* *-rs-* *-sap-* *-sjis* > /dev/null
+# Apache HTTP Server image.
+#
+# Volumes:
+#  * /var/www - Datastore for httpd
+#  * /var/log/httpd24 - Storage for logs when $HTTPD_LOG_TO_VOLUME is set
+# Environment:
+#  * $HTTPD_LOG_TO_VOLUME (optional) - When set, httpd will log into /var/log/httpd24
 
+ENV HTTPD_VERSION=2.4
+
+ENV SUMMARY="Qubinode Apache httpd $HTTPD_VERSION" \
+    DESCRIPTION="Webserver for serving up httpd content"
+>>>>>>> master
+
+LABEL summary="$SUMMARY" \
+      description="$DESCRIPTION" \
+      name="qubi/httpd" \
+      version="1" \
+      usage="fill me in" \
+      maintainer="Qubinode.io <rheron@rodhouse.org>"
+
+<<<<<<< HEAD
 # Update image
 RUN dnf install httpd procps-ng -y
 =======
@@ -37,12 +61,17 @@ LABEL summary="$SUMMARY" \
       usage="fill me in" \
       maintainer="Qubinode.io <rheron@rodhouse.org>"
 
+=======
+>>>>>>> master
 EXPOSE 80
 
 RUN microdnf update -y && rm -rf /var/cache/yum
 RUN microdnf install httpd -y && microdnf clean all
 RUN mkdir -p /var/www/html/img
+<<<<<<< HEAD
 >>>>>>> e81d5f9 (add option to configure webserver landing page)
+=======
+>>>>>>> master
 
 # Add configuration file
 copy welcome.conf /etc/httpd/conf.d/welcome.conf
@@ -61,10 +90,16 @@ RUN mkdir -p /var/www/html/pub && \
 
 # Start the service
 <<<<<<< HEAD
+<<<<<<< HEAD
 CMD mkdir /run/httpd ; /usr/sbin/httpd -D FOREGROUND
 =======
+=======
+>>>>>>> master
 CMD ["-D", "FOREGROUND"]
 ENTRYPOINT ["/usr/sbin/httpd"]
 
 USER root
+<<<<<<< HEAD
 >>>>>>> e81d5f9 (add option to configure webserver landing page)
+=======
+>>>>>>> master
